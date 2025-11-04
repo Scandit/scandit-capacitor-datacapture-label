@@ -1,0 +1,114 @@
+ext {
+    androidxCoreVersion = project.hasProperty('androidxCoreVersion') ? rootProject.ext.androidxCoreVersion : '1.10.0'
+    androidxAppCompatVersion = project.hasProperty('androidxAppCompatVersion') ? rootProject.ext.androidxAppCompatVersion : '1.6.1'
+    cordovaAndroidVersion =  project.hasProperty('cordovaAndroidVersion') ? rootProject.ext.cordovaAndroidVersion : '10.1.1'
+}
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+buildscript {
+    def retrieveCapacitorCompatibility = {
+        def appModule = rootProject.findProject(":app")
+        if (appModule == null) {
+            return
+        }
+
+        def file = appModule.file("capacitor.build.gradle")
+        if (file.exists()) {
+            def content = file.text
+
+            def sourceCompatibilityMatch = content =~ /sourceCompatibility\s+JavaVersion.VERSION_(\d+)/
+            def targetCompatibilityMatch = content =~ /targetCompatibility\s+JavaVersion.VERSION_(\d+)/
+
+            if (sourceCompatibilityMatch) {
+                ext.rootSourceCompatibility = JavaVersion.toVersion(sourceCompatibilityMatch[0][1])
+            } else {
+                ext.rootSourceCompatibility = JavaVersion.VERSION_17
+            }
+
+            if (targetCompatibilityMatch) {
+                ext.rootTargetCompatibility = JavaVersion.toVersion(targetCompatibilityMatch[0][1])
+            } else {
+                ext.rootTargetCompatibility = JavaVersion.VERSION_17
+            }
+
+            if (ext.rootTargetCompatibility == JavaVersion.VERSION_21) {
+                ext.kotlin_version = "1.9.25"
+                ext.agp_version = "8.7.2"
+            }
+        }
+    }
+
+    ext {
+        kotlin_version = "1.9.25"
+        agp_version = "8.5.2"
+        rootSourceCompatibility = JavaVersion.VERSION_17
+        rootTargetCompatibility = JavaVersion.VERSION_17
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+
+    retrieveCapacitorCompatibility()
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace "com.scandit.capacitor.datacapture.barcode"
+    compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 33
+    defaultConfig {
+        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 23
+        targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 33
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility = rootSourceCompatibility
+        targetCompatibility = rootTargetCompatibility
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    def sdk_version = "8.0.0"
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'library', include: ['*.aar'])
+    implementation project(':capacitor-android')
+
+    implementation project(':scandit-capacitor-datacapture-core')
+    implementation project(':scandit-capacitor-datacapture-barcode')
+    println("Version of the native sdk used in this build: ${safeExtGet('global_sdk_version', sdk_version)}")
+    if (findProject(':scandit-datacapture-frameworks-label') != null) {
+        api project(":scandit-datacapture-frameworks-label")
+    } else {
+        api "com.scandit.datacapture.frameworks:label:${safeExtGet('global_sdk_version', sdk_version)}"
+    }
+
+    implementation "androidx.core:core-ktx:$androidxCoreVersion"
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+}

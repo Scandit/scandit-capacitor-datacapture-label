@@ -1,0 +1,15 @@
+platform :ios, '15.0'
+
+def capacitor_pods
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+  pod 'Capacitor', :path => '../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
+end
+
+target 'ScanditCapacitorDatacaptureLabel' do
+  capacitor_pods
+  pod 'ScanditCapacitorDatacaptureCore', :path => '../../scandit-capacitor-datacapture-core/ScanditCapacitorDatacaptureCore.podspec'
+  pod 'ScanditCapacitorDatacaptureBarcode', :path => '../../scandit-capacitor-datacapture-barcode/ScanditCapacitorDatacaptureBarcode.podspec'
+end
+
