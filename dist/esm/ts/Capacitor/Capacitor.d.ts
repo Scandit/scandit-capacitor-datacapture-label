@@ -1,4 +1,3 @@
-import { CapacitorNativeCaller } from 'scandit-capacitor-datacapture-core';
 import { LabelCaptureDefaults } from 'scandit-datacapture-frameworks-label';
 export declare const Capacitor: {
     pluginName: string;
@@ -12,4 +11,3 @@ export interface CapacitorWindow extends Window {
     Capacitor: any;
 }
 export declare const getDefaults: () => Promise<LabelCaptureDefaults>;
-export declare const capacitorLabelNativeCaller: CapacitorNativeCaller;

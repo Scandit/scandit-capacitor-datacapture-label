@@ -65,7 +65,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace "com.scandit.capacitor.datacapture.barcode"
+    namespace "com.scandit.capacitor.datacapture.label"
     compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 33
     defaultConfig {
         minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 23
@@ -94,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    def sdk_version = "8.0.0"
+    def sdk_version = "8.1.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation fileTree(dir: 'library', include: ['*.aar'])
