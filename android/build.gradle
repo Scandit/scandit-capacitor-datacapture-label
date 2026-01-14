@@ -94,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    def sdk_version = "8.1.0"
+    def sdk_version = "8.0.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation fileTree(dir: 'library', include: ['*.aar'])
