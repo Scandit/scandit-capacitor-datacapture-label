@@ -1,6 +1,6 @@
 {
   "name": "scandit-capacitor-datacapture-label",
-  "version": "8.2.0",
+  "version": "8.2.1",
   "description": "Scandit Data Capture SDK for Capacitor",
   "license": "Apache-2.0",
   "private": false,
@@ -33,11 +33,11 @@
     "coverage": "jest --coverage"
   },
   "dependencies": {
-    "scandit-capacitor-datacapture-core": "8.2.0",
-    "scandit-capacitor-datacapture-barcode": "8.2.0",
-    "scandit-datacapture-frameworks-core": "8.2.0",
-    "scandit-datacapture-frameworks-barcode": "8.2.0",
-    "scandit-datacapture-frameworks-label": "8.2.0"
+    "scandit-capacitor-datacapture-core": "8.2.1",
+    "scandit-capacitor-datacapture-barcode": "8.2.1",
+    "scandit-datacapture-frameworks-core": "8.2.1",
+    "scandit-datacapture-frameworks-barcode": "8.2.1",
+    "scandit-datacapture-frameworks-label": "8.2.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
