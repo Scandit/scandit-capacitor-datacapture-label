@@ -9,41 +9,6 @@ def safeExtGet(prop, fallback) {
 }
 
 buildscript {
-    def getFrameworksFile = { String rootDir ->
-        def currentDir = new File(rootDir)
-
-        while (currentDir != null) {
-            def frameworksFile = new File(currentDir, "common/frameworks.gradle")
-            if (frameworksFile.exists()) {
-                return frameworksFile.absolutePath
-            }
-            currentDir = currentDir.getParentFile()
-        }
-
-        return null
-    }
-
-
-    def getCapacitorMajorVersion = {
-        try {
-            def capacitorAndroidDir = new File(rootProject.projectDir, "node_modules/@capacitor/android")
-            if (capacitorAndroidDir.exists()) {
-                def packageJson = new File(capacitorAndroidDir, "package.json")
-                if (packageJson.exists()) {
-                    def json = new groovy.json.JsonSlurper().parseText(packageJson.text)
-                    def version = json.version
-                    if (version) {
-                        def majorVersion = version.tokenize('.')[0] as Integer
-                        return majorVersion
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // Fallback if detection fails
-        }
-        return 7 // Default to Capacitor 7 if detection fails
-    }
-
     def retrieveCapacitorCompatibility = {
         def appModule = rootProject.findProject(":app")
         if (appModule == null) {
@@ -68,54 +33,45 @@ buildscript {
             } else {
                 ext.rootTargetCompatibility = JavaVersion.VERSION_17
             }
+
+            if (ext.rootTargetCompatibility == JavaVersion.VERSION_21) {
+                ext.kotlin_version = "1.9.25"
+                ext.agp_version = "8.7.2"
+            }
         }
     }
 
     ext {
+        kotlin_version = "1.9.25"
+        agp_version = "8.5.2"
         rootSourceCompatibility = JavaVersion.VERSION_17
         rootTargetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Check for monorepo frameworks.gradle
-    def common_gradle_script = getFrameworksFile(rootProject.projectDir.path)
-    if (common_gradle_script != null) {
-        apply from: common_gradle_script
-    }
-
-    retrieveCapacitorCompatibility()
-
-    // Set AGP version if not already defined by frameworks.gradle or root project
-    if (!ext.has('agpVersion') && !rootProject.ext.has('agpVersion')) {
-        def capacitorMajorVersion = getCapacitorMajorVersion()
-        ext.agpVersion = capacitorMajorVersion >= 8 ? '8.13.0' : '8.7.2'
-    }
-
-    // Use repos from frameworks.gradle if available, otherwise explicit repos
-    if (ext.has('repos')) {
-        repositories ext.repos
-    } else {
-        repositories {
-            google()
-            mavenCentral()
-        }
+    repositories {
+        google()
+        mavenCentral()
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:$agpVersion"
+        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+
+    retrieveCapacitorCompatibility()
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     namespace "com.scandit.capacitor.datacapture.label"
-    compileSdk project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 33
+    compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 33
     defaultConfig {
-        minSdk project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
-        targetSdk project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 33
+        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 23
+        targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 33
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -132,18 +88,13 @@ android {
     }
 }
 
-// Use repos from frameworks.gradle if available, otherwise explicit repos
-if (ext.has('repos')) {
-    repositories ext.repos
-} else {
-    repositories {
-        google()
-        mavenCentral()
-    }
+repositories {
+    google()
+    mavenCentral()
 }
 
 dependencies {
-    def sdk_version = "8.2.1"
+    def sdk_version = "8.1.2"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation fileTree(dir: 'library', include: ['*.aar'])
@@ -151,6 +102,7 @@ dependencies {
 
     implementation project(':scandit-capacitor-datacapture-core')
     implementation project(':scandit-capacitor-datacapture-barcode')
+    println("Version of the native sdk used in this build: ${safeExtGet('global_sdk_version', sdk_version)}")
     if (findProject(':scandit-datacapture-frameworks-label') != null) {
         api project(":scandit-datacapture-frameworks-label")
     } else {
