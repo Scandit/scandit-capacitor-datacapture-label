@@ -1,5 +1,5 @@
+// swift-tools-version: 5.9
 import Foundation
-// swift-tools-version: 5.5
 import PackageDescription
 
 // Read version from package.json
@@ -26,7 +26,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", "7.0.0"..<"9.0.0"),
         .package(
             url: "https://github.com/Scandit/scandit-capacitor-datacapture-core.git",
             exact: Version(stringLiteral: version)
