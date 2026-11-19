@@ -16,7 +16,7 @@ public class ScanditCapacitorLabel: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "ScanditCapacitorLabel"
     public let jsName = "ScanditLabelNative"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "getDynamicDefaults", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getDefaults", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "executeLabel", returnType: CAPPluginReturnPromise),
     ]
 
@@ -24,13 +24,12 @@ public class ScanditCapacitorLabel: CAPPlugin, CAPBridgedPlugin {
 
     override public func load() {
         let emitter = CapacitorEventEmitter(with: self)
-        labelModule = LabelCaptureModule(emitter: RegistryEmitter(platformEmitter: emitter))
+        labelModule = LabelCaptureModule(emitter: emitter)
         labelModule.didStart()
     }
 
-    @objc(getDynamicDefaults:)
-    func getDynamicDefaults(_ call: CAPPluginCall) {
-        let defaults = labelModule.getDynamicDefaults()
+    @objc func getDefaults(_ call: CAPPluginCall) {
+        let defaults = labelModule.getDefaults()
         let defaultsResult = ["LabelCapture": defaults]
         call.resolve(defaultsResult)
     }
