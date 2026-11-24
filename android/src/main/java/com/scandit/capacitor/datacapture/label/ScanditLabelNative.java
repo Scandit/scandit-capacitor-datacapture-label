@@ -21,6 +21,8 @@ import com.scandit.capacitor.datacapture.core.utils.CapacitorMethodCall;
 import com.scandit.capacitor.datacapture.core.utils.CapacitorResult;
 import com.scandit.datacapture.frameworks.core.CoreModule;
 import com.scandit.datacapture.frameworks.core.events.Emitter;
+import com.scandit.datacapture.frameworks.core.listeners.registry.ListenerRegistry;
+import com.scandit.datacapture.frameworks.core.listeners.registry.RegistryEmitter;
 import com.scandit.datacapture.frameworks.core.locator.DefaultServiceLocator;
 import com.scandit.datacapture.frameworks.core.utils.DefaultFrameworksLog;
 import com.scandit.datacapture.frameworks.core.utils.FrameworksLog;
@@ -46,7 +48,8 @@ public class ScanditLabelNative extends Plugin implements Emitter {
   private final DefaultServiceLocator serviceLocator;
 
   public ScanditLabelNative() {
-    this.labelModule = LabelCaptureModule.create(this);
+    this.labelModule =
+        LabelCaptureModule.create(new RegistryEmitter(this, ListenerRegistry.getInstance()));
     this.logger = DefaultFrameworksLog.getInstance();
     this.serviceLocator = DefaultServiceLocator.getInstance();
   }
@@ -88,15 +91,16 @@ public class ScanditLabelNative extends Plugin implements Emitter {
   }
 
   @PluginMethod
-  public void getDefaults(PluginCall call) {
+  public void getDynamicDefaults(PluginCall call) {
     Map<String, Object> defaultsMap = new HashMap<>();
-    defaultsMap.put("LabelCapture", labelModule.getDefaults());
+    defaultsMap.put("LabelCapture", labelModule.getDynamicDefaults());
 
-    JSObject defaults = null;
+    JSObject defaults;
     try {
       defaults = JSObject.fromJSONObject(new JSONObject(defaultsMap));
     } catch (JSONException e) {
-      call.reject("Unable to get the label capture defaults.", e);
+      call.reject("Unable to get the label capture dynamic defaults.", e);
+      return;
     }
     call.resolve(defaults);
   }
@@ -144,5 +148,10 @@ public class ScanditLabelNative extends Plugin implements Emitter {
   @Override
   public boolean hasModeSpecificListenersForEvent(int modeId, @NonNull String eventName) {
     return this.hasListenersForEvent(eventName);
+  }
+
+  @Override
+  public boolean hasRegisteredViewListenersForEvent(int viewId, @NonNull String eventName) {
+    return false;
   }
 }

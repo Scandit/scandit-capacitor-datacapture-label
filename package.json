@@ -1,6 +1,6 @@
 {
   "name": "scandit-capacitor-datacapture-label",
-  "version": "8.6.3",
+  "version": "8.7.2",
   "description": "Scandit Data Capture SDK for Capacitor",
   "license": "Apache-2.0",
   "private": false,
@@ -30,11 +30,12 @@
     "clean": "rimraf ./dist",
     "watch": "tsc -p tsconfig.build.json --watch",
     "jest": "jest",
+    "test": "jest --coverage --maxWorkers=12 --passWithNoTests",
     "coverage": "jest --coverage"
   },
   "dependencies": {
-    "scandit-capacitor-datacapture-core": "8.6.3",
-    "scandit-capacitor-datacapture-barcode": "8.6.3"
+    "scandit-capacitor-datacapture-core": "8.7.2",
+    "scandit-capacitor-datacapture-barcode": "8.7.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
